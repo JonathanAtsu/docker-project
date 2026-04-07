@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: build image
-        run: docker build -t my-app:nginx .
-              docker tag my-app:nginx my-dockerhub-username/my-app:nginx
-              docker push my-dockerhub-username/my-app:nginx
+        run: |
+            docker buildx build -t my-app:nginx .
+            docker tag my-app:nginx 
+             
