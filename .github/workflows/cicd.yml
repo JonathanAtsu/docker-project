@@ -17,5 +17,5 @@ jobs:
       - name: build image
         run: |
             docker buildx build -t my-app:nginx .
-            docker tag my-app:nginx 
+            docker tag my-app:nginx my-app:latest
              
