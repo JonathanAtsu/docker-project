@@ -25,12 +25,14 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4
 
-      - name: push to ECR
+      - name: login to ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      
+
       - name: aws credentials OIDC
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
+          mask-aws-account-id: false 
           role-to-assume: ${{ secrets.ECR_ROLE_ROLE }}
           aws-region: us-east-1
           run: |
