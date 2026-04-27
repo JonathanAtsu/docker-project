@@ -7,38 +7,45 @@ on:
     branches:
       - main
 
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: build image
-        run: |
-            docker buildx build -t my-app:nginx .
-            docker tag my-app:nginx my-app:latest
-  push-image:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
 
-      - name: login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          mask-aws-account-id: false
-          aws-region: us-east-1
-          
-
-      - name: aws credentials OIDC
+      - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          mask-aws-account-id: false 
           role-to-assume: ${{ secrets.ECR_ROLE_ROLE }}
           aws-region: us-east-1
-          run: |
-           docker push ${{ secrets.ECR_REPO }}/${{ secrets.ECR_REPO }}:latest
-           
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-app:latest .
+
+      - name: Tag Docker image for ECR
+        run: |
+          docker tag my-app:latest ${{ secrets.ECR_REPO }}:latest
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.ECR_REPO }}:latest
