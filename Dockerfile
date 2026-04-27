@@ -4,4 +4,4 @@ FROM nginx
 EXPOSE 80
 CMD ["nginx", "-g", "daemon on;"]
 # RUN chmod -R 755 
-RUN apt update 
+RUN apt update && apt install -y curl
